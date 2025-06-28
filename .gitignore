@@ -1,0 +1,6 @@
+# Ignore logs and scan results
+*.log
+*.txt
+*.out
+*.pcap
+glyph-missionlog-*/
