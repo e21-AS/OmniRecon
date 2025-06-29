@@ -4,10 +4,15 @@
 # 🛰️ OmniRecon – Glyph: The Info Drone
 # ========================================================
 
-# Glyph's welcoming monit
-echo "----------------------------------------------------------------------------------"
-echo "Hello Commander, I'm Glyph, your Info Drone. Starting initialization procedures..."
-echo "----------------------------------------------------------------------------------"
+# Glyph's welcoming function
+glyph_welcome () {
+    echo "----------------------------------------------------------------------------------"
+    echo "Hello Commander, I'm Glyph, your Info Drone. Starting initialization procedures..."
+    echo "----------------------------------------------------------------------------------"
+}
+
+# Call glyph_welcome
+glyph_welcome
 
 # Check if $1 was provided as input.
 ATTEMPTS=0
@@ -54,7 +59,7 @@ echo "The mission has begun at $TIMESTAMP..."
 
 # --- 7. Proceeding with directory creation. ---
 OUTPUT_DIR="glyph-missionlog-$TARGET-$TIMESTAMP"
-echo "---------------------------------------------------"
+echo "--------------------------------------------------------------------------"
 
 # Check if OUTPUT_DIR exist 
 if [ ! -d "./$OUTPUT_DIR" ]; then
