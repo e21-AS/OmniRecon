@@ -8,6 +8,23 @@
 
 # Glyph's welcoming function
 glyph_welcome () {
+     echo "----------------------------------------------------------------------------------"
+        echo -e "\e[36m"
+cat << "EOF"
+       ________            __         ________            ____      ____
+      / ____/ /_  ______  / /_  _    /_  __/ /_  ___     /  _/___  / __/___
+     / / __/ / / / / __ \/ __ \(_)    / / / __ \/ _ \    / // __ \/ /_/ __ \
+    / /_/ / / /_/ / /_/ / / / /      / / / / / /  __/  _/ // / / / __/ /_/ /
+    \____/_/\__, / .___/_/ /_(_)    /_/ /_/ /_/\___/  /___/_/ /_/_/  \____/
+           /____/_/
+                             ____
+                            / __ \_________  ____  ___
+                           / / / / ___/ __ \/ __ \/ _ \
+                          / /_/ / /  / /_/ / / / /  __/
+                         /_____/_/   \____/_/ /_/\___/
+EOF
+# Control character - end of file (logo block)
+    echo -e "\e[0m"
     echo "----------------------------------------------------------------------------------"
     echo "Hello Commander, I'm Glyph, your Info Drone. Starting initialization procedures..."
     echo "----------------------------------------------------------------------------------"
@@ -43,54 +60,61 @@ glyph_recon_nmap () {
     local output_dir="$2"
 
     # Glyph's scan initial message
-    echo "--------------------------------------------------------------------"
+    echo "----------------------------------------------------------------------------------"
     echo "Initializing basic reconnaissance scan on $target_to_scan, Commander."
     echo "This will include host discovery and top 1000 TCP ports scan."
 
     # Glyph's additional scan configuration
-    echo "--------------------------------------------------------------------"
+    echo "----------------------------------------------------------------------------------"
     echo "Commander, you can enhance this scan with additional options."
     echo "You also have the capability to perform advanced reconnaissance with UDP scan, Commander."
 
     local nmap_options=""
 
     # Option: service version detection (-sV)
+    echo "-------------------------------------------------------------------------------------------------------------------"
     read -rp "Add Service Version Detection (-sV)? (Provides detailed info about running services, e.g., Apache 2.4.52): [y/N] " CHOICE
     if [[ "$CHOICE" =~ ^[yY]$ ]]; then
         nmap_options+=" -sV"
     fi
     
     # Option: OS detection (-O)
+    echo "-------------------------------------------------------------------------------------------------------------------"
     read -rp "Add OS Detection (-O)? (Attempts to identify the target's operating system, e.g., Linux 5.x): [y/N] " CHOICE
     if [[ "$CHOICE" =~ ^[yY]$ ]]; then
         nmap_options+=" -O"
     fi
 
     # Option: use default Nmap scripts (-sC)
+    echo "-------------------------------------------------------------------------------------------------------------------"
     read -rp "Run Default Nmap Scripts (-sC)? (Automates common vulnerability checks and info gathering, may be noisy): [y/N] " CHOICE
     if [[ "$CHOICE" =~ ^[yY]$ ]]; then
         nmap_options+=" -sC"
     fi
 
-    # Option: Aggressive Timing (--T4)
-    read -rp "Use Aggressive Timing (--T4)? (Speeds up scan, but may be detected more easily): [y/N] " CHOICE
+    # Option: Aggressive Timing (-T4)
+    echo "-------------------------------------------------------------------------------------------------------------------"
+    read -rp "Use Aggressive Timing (-T4)? (Speeds up scan, but may be detected more easily): [y/N] " CHOICE
     if [[ "$CHOICE" =~ ^[yY]$ ]]; then
-        nmap_options+=" --T4"
+        nmap_options+=" -T4"
     fi
 
     # Option: show only open ports (--open)
+    echo "-------------------------------------------------------------------------------------------------------------------"
     read -rp "Show Only Open Ports (--open)? (Filters results to only display open ports, ignoring closed/filtered): [y/N] " CHOICE
     if [[ "$CHOICE" =~ ^[yY]$ ]]; then
         nmap_options+=" --open"
     fi
 
     # Option: enable very verbose output (-vv)
+    echo "-------------------------------------------------------------------------------------------------------------------"
     read -rp "Enable Very Verbose Output (-vv)? (Displays more detailed scan information during execution): [y/N] " CHOICE
     if [[ "$CHOICE" =~ ^[yY]$ ]]; then
         nmap_options+=" -vv"
     fi
 
     # Option: UDP Scan (-sU)
+    echo "-------------------------------------------------------------------------------------------------------------------"
     read -rp "Run UDP Scan (-sU)? (Scans top 1000 UDP ports. CAUTION, Commander: This process will be significantly slower than TCP-only scans): [y/N] " CHOICE
     if [[ "$CHOICE" =~ ^[yY]$ ]]; then
         nmap_options+=" -sU"
@@ -108,30 +132,31 @@ glyph_recon_nmap () {
 
     # Checking the exit status of the Nmap command
     if [ $? -ne 0 ]; then
+        echo "-------------------------------------------------------------------------------------------------------------------"
         echo "CRITICAL FAILURE: Recon scan for $target_to_scan encountered an error. Check logs in $output_dir for details, Commander." >&2 # Redirect to stream number 2 (stderr)
         return 1 # Function error
     fi
 
     # Inform scan completion
-    echo "--------------------------------------------------------------------------------"
+    echo "----------------------------------------------------------------------------------"
     # Informing the user about all generated files using a wildcard
     echo "Reconnaissance scan completed, Commander. Results stored in: ${output_file_base}.*"
 
     # Enumerate generated files
-    echo "--------------------------------------------------------------------------------"
+    echo "----------------------------------------------------------------------------------"
     echo "Commander, we have successfully gathered the following intelligence data:"
     ls -lh "${output_file_base}".*
-    echo "--------------------------------------------------------------------------------"
+    echo "----------------------------------------------------------------------------------"
     echo "Awaiting further instructions, Commander."
 }
 
 # Glyph's interrupt handler function
 glyph_interrupt_handler () {
     echo "" # Prevent Glyph's output from being corrupted by the Ctrl+C signal.
-    echo "--------------------------------------------------------------------------------"
+    echo "----------------------------------------------------------------------------------"
     echo "Commander, mission has been aborted upon your request (Ctrl+C received)."
     echo "Shutting down reconnaissance protocols. Standing by for further orders."
-    echo "--------------------------------------------------------------------------------"
+    echo "----------------------------------------------------------------------------------"
     exit 1
 }
 
