@@ -118,11 +118,24 @@ glyph_recon_nmap () {
     echo "Glyph: Awaiting further instructions, Commander."
 }
 
+# Glyph's interrupt handler function
+glyph_interrupt_handler () {
+    echo "" # prevent accidental tearing of Glyph's prompt
+    echo "--------------------------------------------------------------------------------"
+    echo "Commander, mission has been aborted upon your request (Ctrl+C received)."
+    echo "Shutting down reconnaissance protocols. Standing by for further orders."
+    echo "--------------------------------------------------------------------------------"
+    exit 1
+}
+
 
 # --- MAIN SCRIPT ---
 
 # Call glyph_welcome
 glyph_welcome
+
+# Call glyph_interrupt_handler (Ctrl+C (SIGINT))
+trap glyph_interrupt_handler SIGINT
 
 ATTEMPTS=0
 MAX_ATTEMPTS=2
