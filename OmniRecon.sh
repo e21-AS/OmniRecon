@@ -18,15 +18,15 @@ glyph_welcome () {
 glyph_validate_target () {
     local target_to_validate="$1"
     
-    # 1. Check for octet format (4 octets separated by dots)
+    # Check for octet format (4 octets separated by dots)
     if [[ ! "$target_to_validate" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]]; then
         return 1 # Wrong format
     fi
     
-    # 2. Split the IP into four octets
+    # Split the IP into four octets
     IFS='.' read -r octet1 octet2 octet3 octet4 <<< "$target_to_validate"
     
-    # 3. Check if each octet is in valid range (0-255)
+    # Check if each octet is in valid range (0-255)
     if (( octet1 >= 0 && octet1 <= 255 )) && \
        (( octet2 >= 0 && octet2 <= 255 )) && \
        (( octet3 >= 0 && octet3 <= 255 )) && \
@@ -36,6 +36,88 @@ glyph_validate_target () {
         return 1 # Out of range (0-255) - one or more octets are incorrect
     fi
 }
+
+# Glyph's recon Nmap function
+glyph_recon_nmap () {
+    local target_to_scan="$1"
+    local output_dir="$2"
+
+    # Glyph's scan initial message
+    echo "--------------------------------------------------------------------"
+    echo "Initializing basic reconnaissance scan on $target_to_scan, Commander."
+    echo "This will include host discovery and top 1000 TCP ports scan."
+
+    # Glyph's additional scan configuration
+    echo "---------------------------------------------------"
+    echo "Glyph: Commander, you can enhance this scan with additional options."
+
+    local nmap_options=""
+
+    # Option: service version detection (-sV)
+    read -rp "Add Service Version Detection (-sV)? (Provides detailed info about running services, e.g., Apache 2.4.52): [y/N] " CHOICE
+    if [[ "$CHOICE" =~ ^[yY]$ ]]; then
+        nmap_options+=" -sV"
+    fi
+    
+    # Option: OS detection (-O)
+    read -rp "Add OS Detection (-O)? (Attempts to identify the target's operating system, e.g., Linux 5.x): [y/N] " CHOICE
+    if [[ "$CHOICE" =~ ^[yY]$ ]]; then
+        nmap_options+=" -O"
+    fi
+
+    # Option: use default Nmap scripts (-sC)
+    read -rp "Run Default Nmap Scripts (-sC)? (Automates common vulnerability checks and info gathering, may be noisy): [y/N] " CHOICE
+    if [[ "$CHOICE" =~ ^[yY]$ ]]; then
+        nmap_options+=" -sC"
+    fi
+
+    # Option: Aggressive Timing (--T4)
+    read -rp "Use Aggressive Timing (--T4)? (Speeds up scan, but may be detected more easily): [y/N] " CHOICE
+    if [[ "$CHOICE" =~ ^[yY]$ ]]; then
+        nmap_options+=" --T4"
+    fi
+
+    # Option: show only open ports (--open)
+    read -rp "Show Only Open Ports (--open)? (Filters results to only display open ports, ignoring closed/filtered): [y/N] " CHOICE
+    if [[ "$CHOICE" =~ ^[yY]$ ]]; then
+        nmap_options+=" --open"
+    fi
+
+    # Option: enable very verbose output (-vv)
+    read -rp "Enable Very Verbose Output (-vv)? (Displays more detailed scan information during execution): [y/N] " CHOICE
+    if [[ "$CHOICE" =~ ^[yY]$ ]]; then
+        nmap_options+=" -vv"
+    fi
+
+    # Glyph's acknowledge 
+    echo "---------------------------------------------------------------"
+    echo "Preparing to begin recon scan with chosen options, Commander..."
+
+    # Define output file base name
+    local output_file_base="$output_dir/nmap_scan" 
+
+    # Submitting the command
+    nmap -sS -Pn $nmap_options "$target_to_scan" -oA "$output_file_base"
+
+    # Checking the exit status of the Nmap command
+    if [ $? -ne 0 ]; then
+        echo "CRITICAL FAILURE: Recon scan for $target_to_scan encountered an error. Check logs in $output_dir for details, Commander." >&2 # Redirect to stream number 2 (stderr)
+        return 1 # Function error
+    fi
+
+    # Inform scan completion
+    echo "--------------------------------------------------------------------------------"
+    # Informing the user about all generated files using a wildcard
+    echo "Reconnaissance scan completed, Commander. Results stored in: ${output_file_base}.*"
+
+    # Enumerate generated files
+    echo "--------------------------------------------------------------------------------"
+    echo "Commander, we have successfully gathered the following intelligence data:"
+    ls -lh "${output_file_base}".*
+    echo "--------------------------------------------------------------------------------"
+    echo "Glyph: Awaiting further instructions, Commander."
+}
+
 
 # --- MAIN SCRIPT ---
 
@@ -93,7 +175,7 @@ OUTPUT_DIR="glyph-missionlog-$TARGET-$TIMESTAMP"
 echo "--------------------------------------"
 echo "The mission has begun at $TIMESTAMP..."
 
-# Check and create OUTPUT_DIR
+# --- 6. Check and create OUTPUT_DIR ---
 if [ ! -d "./$OUTPUT_DIR" ]; then
     mkdir -p "./$OUTPUT_DIR"
     echo "-----------------------------------------------------------------------------"
@@ -101,6 +183,13 @@ if [ ! -d "./$OUTPUT_DIR" ]; then
 else
     echo "------------------------------------------------------------------"
     echo "Mission's logs are stored in the $OUTPUT_DIR directory, Commander!"
+fi
+
+# Call glyph_recon_nmap function
+if ! glyph_recon_nmap "$TARGET" "$OUTPUT_DIR"; then
+    echo "----------------------------------------------------------------------"
+    echo "Major reconnaissance task failed. Aborting mission, Commander." >&2 # Redirect to stream number 2 (stderr)
+    exit 1
 fi
 
 echo "--------------------------------------------------"
