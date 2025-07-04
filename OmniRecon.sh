@@ -48,8 +48,9 @@ glyph_recon_nmap () {
     echo "This will include host discovery and top 1000 TCP ports scan."
 
     # Glyph's additional scan configuration
-    echo "---------------------------------------------------"
-    echo "Glyph: Commander, you can enhance this scan with additional options."
+    echo "--------------------------------------------------------------------"
+    echo "Commander, you can enhance this scan with additional options."
+    echo "You also have the capability to perform advanced reconnaissance with UDP scan, Commander."
 
     local nmap_options=""
 
@@ -89,6 +90,12 @@ glyph_recon_nmap () {
         nmap_options+=" -vv"
     fi
 
+    # Option: UDP Scan (-sU)
+    read -rp "Run UDP Scan (-sU)? (Scans top 1000 UDP ports. CAUTION, Commander: This process will be significantly slower than TCP-only scans): [y/N] " CHOICE
+    if [[ "$CHOICE" =~ ^[yY]$ ]]; then
+        nmap_options+=" -sU"
+    fi
+
     # Glyph's acknowledge 
     echo "---------------------------------------------------------------"
     echo "Preparing to begin recon scan with chosen options, Commander..."
@@ -115,12 +122,12 @@ glyph_recon_nmap () {
     echo "Commander, we have successfully gathered the following intelligence data:"
     ls -lh "${output_file_base}".*
     echo "--------------------------------------------------------------------------------"
-    echo "Glyph: Awaiting further instructions, Commander."
+    echo "Awaiting further instructions, Commander."
 }
 
 # Glyph's interrupt handler function
 glyph_interrupt_handler () {
-    echo "" # prevent accidental tearing of Glyph's prompt
+    echo "" # Prevent Glyph's output from being corrupted by the Ctrl+C signal.
     echo "--------------------------------------------------------------------------------"
     echo "Commander, mission has been aborted upon your request (Ctrl+C received)."
     echo "Shutting down reconnaissance protocols. Standing by for further orders."
