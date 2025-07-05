@@ -1,6 +1,10 @@
-# Ignore logs and scan results
+# Ignore log files
 *.log
 *.txt
 *.out
+
+# Ignore packet captures
 *.pcap
+
+# Ignore mission logs and scan outputs
 glyph-missionlog-*/
